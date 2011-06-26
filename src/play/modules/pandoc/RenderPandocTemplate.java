@@ -55,7 +55,7 @@ public class RenderPandocTemplate extends Result {
 
 	public void apply(Http.Request request, Http.Response response) {
         try {
-			if (PandocPlugin.isPandocSupported()) {
+			if (PandocPlugin.isPandocSupported() && format != null && PandocPlugin.supportedFormats.contains(format)) {
 				String fileName = templateName+(format.extension == null ? "" : "."+format.extension);
 				response.setHeader("Content-Disposition",
 							String.format("%s; filename=\"%s\"", attachment ? "attachment" : "inline", fileName));
@@ -63,7 +63,7 @@ public class RenderPandocTemplate extends Result {
 				renderPandoc(response.out);
 			}
 			else {
-				Logger.warn("Pandoc support not installed, rendering as HTML");
+				Logger.warn("Pandoc support or support for format '"+format+"' is not installed, rendering as HTML instead");
 				setContentTypeIfNotSet(response, "text/html;charset=utf-8");
 				response.out.write(templateString.getBytes("UTF-8"));
 			}

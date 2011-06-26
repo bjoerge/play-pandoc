@@ -34,7 +34,8 @@ public class PandocPlugin extends PlayPlugin {
 		TEXINFO("texinfo", "GNU Texinfo", "application/x-texinfo", "texi"),
 //		DOCBOOK("docbook", "DocBook XML", "application/docbook+xml", "xml"),
 //		OPENDOCUMENT("opendocument", "OpenDocument XML", "application/vnd.oasis.opendocument.text", "odt"),
-		RTF("rtf", "RTF", "application/rtf", "rtf");
+		RTF("rtf", "RTF", "application/rtf", "rtf"),
+		;
 
 		public final String identifier;
 		public final String mimetype;
@@ -48,18 +49,19 @@ public class PandocPlugin extends PlayPlugin {
 			this.extension = extension;
 		}
 
-		public static Format fromString(String identifier) {			for (Format f : Format.values()) {
+		public static Format fromString(String identifier) {
+			for (Format f : Format.values()) {
 				if (f.identifier.equalsIgnoreCase(identifier))
 					return f;
 			}
-			throw new EnumConstantNotPresentException(Format.class, identifier);
+			return null;
 		}
 		public static boolean contains(String format) {
 			for (Format f : Format.values()) {
 				if (f.identifier.equalsIgnoreCase(format))
 					return true;
 			}
-			throw new EnumConstantNotPresentException(Format.class, format);
+			return false;
 		}
 	}
 	public static final String PLUGIN_VERSION = "0.1";
@@ -109,11 +111,11 @@ public class PandocPlugin extends PlayPlugin {
 			}
 			pandocSupport = true;
 		} catch (IOException e) {
-			Logger.warn(msg_("Pandoc support is required but not found. renderFormat methods will return html. Please refer to http://johnmacfarlane.net/pandoc/installing.html for installing Pandoc on your system."));
+			Logger.warn(msg_("Pandoc not found. Please verify that Pandoc is installed and the 'pandoc.executable' configuration  property is set accordingly. Please refer to http://johnmacfarlane.net/pandoc/installing.html for instructions on how to install Pandoc on your system."));
 		} catch (ExceptionInInitializerError e) {
 			Logger.warn(msg_("Pandoc support found but unable to determine version and supported formats: %s", e.getMessage()));
 		} catch (InterruptedException e) {
-			Logger.warn(msg_("Got InterruptedException when trying to figure out whether Pandoc is supported: %s", e.getMessage()));
+			Logger.warn(msg_("Got interrupted when trying to figure out whether Pandoc is supported: %s", e.getMessage()));
 		}
 	}
 	private static String[] findSupportedFormats() {
